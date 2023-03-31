@@ -74,4 +74,5 @@
         </div>
     </div>
 </div>
+<footer-component class="mt-5"></footer-component>
 @endsection
