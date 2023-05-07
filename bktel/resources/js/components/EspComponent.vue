@@ -30,9 +30,10 @@
     <tr>
       <td>
         <div class="d-flex align-items-center">
-          <i class="fa-sharp fa-solid fa-wind font-icon-humid-air mr-icon" ></i>
+          <!-- <i class="fa-sharp fa-solid fa-wind font-icon-humid-air mr-icon" ></i> -->
+            <i class="fa-solid fa-droplet font-icon-humid-air mr-icon"></i>
           <div class="ms-3">
-            <p class="fw-bold mb-1 font-size-home  mr-icon">Air humidity</p>
+            <p class="fw-bold mb-1 font-size-home  mr-icon">Humidity</p>
           </div>
         </div>
       </td>
@@ -48,7 +49,8 @@
     <tr>
       <td>
         <div class="d-flex align-items-center">
-          <i class="fa-solid fa-droplet font-icon-humid-ground mr-icon"></i>
+          <!-- <i class="fa-solid fa-droplet font-icon-humid-ground mr-icon"></i> -->
+          <i class="uil uil-mountains font-icon-humid-ground mr-icon"></i>
           <div class="ms-3">
             <p class="fw-bold mb-1 font-size-home  mr-icon">Ground Humid</p>
           </div>
@@ -66,8 +68,12 @@
   </tbody>
 </table>
       <div class="mt-home flex"> 
-        <button class="btn btn-primary right watering"> Watering </button>
+        <button class="btn  right watering" :class="[watering === 1 ? 'btn-danger' :  'btn-primary']" @click="watering_func"> Watering </button>
       </div>
+      <div  class="time_show">  
+        <span id="span" class="span-time"></span>
+      </div>
+
       </div>
 
   
@@ -78,6 +84,23 @@
 <style>
 .watering{
   padding: 20px;
+}
+.time_show {
+  display: block;
+    text-align: center;
+}
+.span-time {
+  display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    background-color: white; 
+    padding : 80px;
+    border-radius: 10px;
+    background-image: url(https://media.istockphoto.com/id/1176645523/vector/black-empty-clock-isolated-on-white-for-pattern-and-design.jpg?s=612x612&w=0&k=20&c=KbVtZd6GwY4H1qa1ynUSHPPHYiH_zh5-rwCA20YFK1U=) !important;
+    background-position: center;
+    background-size: 80%; 
+    background-repeat: no-repeat
 }
 .mt-home{
   margin-top: 20px;
@@ -98,12 +121,12 @@
 }
 .font-icon-humid-ground{
   font-size: 45px;
-  color: rgb(31, 115, 250);
+  color: rgb(164, 79, 0);
   margin-left: 8px;
 }
 .font-icon-humid-air{
   font-size: 45px;
-  color: rgb(167, 195, 241);
+  color: rgb(74, 143, 255);
   margin-left: 8px;
 }
 .border-radius {
@@ -135,14 +158,13 @@ import firebase from 'firebase'
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = { 
-  apiKey : "AIzaSyBo7uyi84oE9I6jIHVkyIny2hPKiVX5LGk" , 
-  authDomain : "tslproject-959c3.firebaseapp.com" , 
-  databaseURL : "https://tslproject-959c3-default-rtdb.firebaseio.com" , 
-  projectId : "tslproject-959c3" , 
-  storageBucket : "tslproject-959c3.appspot.com" , 
-  messagingSenderId : "113915189951" , 
-  appId : "1:113915189951:web:8f3d1a0a70561ac716040a" , 
-  measurementId : "G-QPBMRW6XEX" 
+  apiKey: "AIzaSyBruMJZszXjft9YogY27gAsM4MMFed9LEI",
+  authDomain: "tsl-b2fdf.firebaseapp.com",
+  databaseURL: "https://tsl-b2fdf-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "tsl-b2fdf",
+  storageBucket: "tsl-b2fdf.appspot.com",
+  messagingSenderId: "17640750701",
+  appId: "1:17640750701:web:84dc35965bede867fdc964"
 };
 
 // Initialize Firebase
@@ -161,9 +183,27 @@ const firebaseConfig = {
                 tempurature: 7,
                 air_humid: 7,
                 ground_humid: 7,
+                watering: 0, 
+                d: 0, 
+                s:0,
+                m:0 ,
+                h:0
             }
         },  
         mounted(){
+          var span = document.getElementById('span');
+
+function time() {
+  this.d = new Date();
+  var s = d.getSeconds();
+  var m = d.getMinutes();
+  var h = d.getHours();
+  span.textContent = 
+    ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2) + ":" + ("0" + s).substr(-2);
+}
+
+setInterval(time, 1000);
+
           const self = this;
         app.database()
             .ref('test')
@@ -171,15 +211,27 @@ const firebaseConfig = {
                 // const id = snapshot.key;
     
                 //----------OR----------//
-                self.tempurature = snapshot.val().int || null;
-                self.air_humid = snapshot.val().air_humid || null;
-                self.ground_humid = snapshot.val().ground_humid || null;
+                self.tempurature = snapshot.val().temp ;
+                self.air_humid = snapshot.val().humid ;
+                self.ground_humid = snapshot.val().ground;
                 // if (data) {
                 //   const id = Object.keys(data)[0];
                 // }
             });
     
+      }, 
+      methods: {
+    async watering_func(){
+      if(this.watering ==1 ){
+        this.watering = 0;
       }
+      else  {
+        this.watering = 1;
+      }
+      app.database()
+            .ref('test').set({watering : this.watering})
+      } 
+    }
        
         // methods: function getData(){  
         // const starCountRef = ref(database,'posts/' + postId + '/starCount');
